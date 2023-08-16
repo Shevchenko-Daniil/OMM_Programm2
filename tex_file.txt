@@ -1,0 +1,443 @@
+\documentclass{article}
+
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+\usepackage[russian]{babel}
+
+% Set page size and margins
+% Replace `letterpaper' with `a4paper' for UK/EU standard size
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+
+\author{Автор}
+
+\begin{document}
+
+\begin{titlepage}
+\newpage
+\begin{center}
+{МОСКОВСКИЙ ГОСУДАРСТВЕННЫЙ УНИВЕРСИТЕТ имени М.В. ЛОМОНОСОВА\\
+\hrulefill\\
+
+ФИЗИЧЕСКИЙ ФАКУЛЬТЕТ}
+\vspace{6cm}
+
+
+\Large{\textbf{Отчет по практическому заданию №2}}\\
+Основы математического моделирования\\
+\vspace{0,3cm}
+
+\end{center}
+\vspace{4cm}
+\begin{flushright}
+Автор работы:\\
+студент группы 325\\
+Шевченко Даниил Александрович\\
+\end{flushright}
+\vspace{6cm}
+\begin{center}
+Москва -- 2023
+\end{center}
+
+\end{titlepage}
+
+\clearpage
+\setcounter{page}{2}
+
+\tableofcontents
+
+\clearpage
+
+\section{Постановка задачи}
+Используя метод переменных направлений, решите краевую задачу:
+\begin{equation}
+\label{nachzad}
+    \begin{cases}
+        \vspace{0.2cm}
+        \displaystyle \frac{\partial u}{\partial t} = \Delta u + xt^2\sin{y}, 0<x<1, 0<y<\pi/2, t>0\\
+        \vspace{0.2cm}
+        \displaystyle \frac{\partial u}{\partial x}\bigg|_{x=0} = \frac{\partial u}{\partial x}\bigg|_{x=1} = 0,\\
+        \vspace{0.2cm}
+        \displaystyle u|_{y=0} = \frac{\partial u}{\partial y}\bigg|_{y=\pi /2} = 0,\\
+        \vspace{0.2cm}
+        \displaystyle u |_{t=0} = 0
+
+    \end{cases}
+\end{equation}
+
+\section{Аналитическое решение задачи}
+1. Решим вспомогательную задачу Штурма-Лиувилля:
+\begin{displaymath}
+    \begin{cases}
+        \displaystyle \Delta v + \lambda v = 0\\
+        \displaystyle v_x|_{x=0} = v_x|_{x=1} = 0\\
+        \displaystyle v|_{y=0} = v_y|_{y=\pi /2} = 0
+    \end{cases}
+\end{displaymath}
+Получим:
+\begin{displaymath}
+    \begin{cases}
+        \vspace{0.2 cm}
+        \displaystyle v_{nm}(x, y) = \cos{(\pi n x)}\sin{\left( 2\left( m-\frac{1}{2}\right) y\right) }, n=0, 1, 2,..., m = 1, 2,... \\
+        \vspace{0.2 cm}
+        \displaystyle \lambda_{nm} = (\pi n)^2 + \left( 2\left( m - \frac{1}{2}\right) \right)^2\\
+        \displaystyle ||v_{nm}||^2 = \frac{\pi}{8}(1+ \delta_{n0})
+    \end{cases}
+\end{displaymath}
+2. Разложим неоднородность $f(x, y, t) = xt^2\sin{y}$ в ряд по $v_{nm}$:
+\begin{displaymath}
+    \displaystyle f(x, y, t) = \sum\limits_n^{\infty}\sum\limits_m^{\infty}f_{nm}(t)v_{nm}(x, y), 
+\end{displaymath}
+где 
+\begin{displaymath}
+    \displaystyle f_{nm}(t) = \frac{1}{||v_{nm}||^2}\int\limits_0^1 dx \int\limits_0^{\pi /2}dy f(x, y, t)v_{nm}(x, y)
+\end{displaymath}
+Получим, что
+\begin{displaymath}
+    \begin{cases}
+        \vspace{0.2 cm}
+        \displaystyle f_{01} = \frac{t^2}{2}\\
+        \vspace{0.2 cm}
+        \displaystyle f_{0m} = 0, m = 2, 3,...\\
+        \vspace{0.2 cm}
+        \displaystyle f_{n1} = \frac{-4t^2}{\pi ^2 n^2}, n=2k+1, k=0,1,2,...\\
+        \vspace{0.2 cm}
+        \displaystyle f_{nm} = 0, m = 2, 3,...\\
+    \end{cases}
+\end{displaymath}
+3. Будем искать решение задачи \ref{nachzad} в виде ряда:
+\begin{displaymath}
+\displaystyle u(x, y, t) = \sum\limits_n^{\infty}\sum\limits_m^{\infty}T_{nm}(t)v_{nm}(x, y)
+\end{displaymath}
+Подставим этот вид в исходную задачу:
+\begin{equation}
+    \label{newzad}
+    \begin{cases}
+        \displaystyle \sum\limits_{n,m}T_{nm}^{\prime}(t)v_{nm} = \sum\limits_{n,m}T_{nm}(t)\Delta v_{nm} + \sum\limits_{n, m}f_{nm}(t)v_{nm}\\
+        \displaystyle \sum\limits_{n, m}T_{nm}(0)v_{nm} = 0
+    \end{cases}
+\end{equation}
+Заметим, что $\Delta v_{nm} = -\lambda_{nm}v_{nm}$, тогда в \ref{newzad} можно сократить множители $v_{nm}$. Получим:
+\begin{displaymath}
+    \begin{cases}
+        \displaystyle T_{nm}^{\prime}(t) + \lambda_{nm}T_{nm}(t) = f_{nm}(t)\\
+        \displaystyle T_{nm}(0) = 0
+    \end{cases}
+\end{displaymath}
+Это задача Коши для ОДУ первого порядка. Ее решение можно записать в виде:
+\begin{displaymath}
+    \displaystyle T_{nm} = \int\limits_0^t e^{-\lambda_{nm}(t-\tau)}f_{nm}(\tau)d\tau
+\end{displaymath}
+Итоговые выражения для $T_{nm}$ примут вид:
+\begin{displaymath}
+    \begin{cases}
+        \vspace{0.2 cm}
+        \displaystyle T_{01} = -e^{-t} + \frac{t^2}{2} - t +1\\
+        \vspace{0.2 cm}
+        \displaystyle T_{n1} = \frac{-4t^2}{\pi^2 n^2 (\pi^2 n^2 + 1)} + \frac{8t}{\pi^2 n^2 (\pi^2 n^2 + 1)^2} - \frac{8}{\pi^2 n^2 (\pi^2 n^2 + 1)^3}\left( 1 - e^{-(\pi^2 n^2 + 1)t} \right), n=2k+1, k=0,1,2,...\\
+        \vspace{0.2 cm}
+        \displaystyle T_{nm} = 0, m=2,3,...
+    \end{cases}
+\end{displaymath}
+Аналитическое решение задачи \ref{nachzad} выглядит следующим образом:
+\begin{equation}
+    \label{analresh}
+    u(x, y, t) = T_{01}\sin{y} + \sin{y}\sum\limits_{k=0}^{\infty}T_{2k+1,1}\cos{\pi x (2k+1)}
+\end{equation}
+На Рис. \ref{anal_res} представлено решение, полученное из выражения \ref{analresh} в момент времени $t = 1$. 
+\begin{figure}[h]
+	\center{\includegraphics[scale=0.25]{anal_res_t_1}}
+	\caption{Аналитическое решение задачи при $t=1$}	
+        \label{anal_res}
+\end{figure}
+\section{Численное решение}
+\subsection{Построение разностной схемы}
+Введем в области рассмотрения $\Omega = \left\{ (x, y, t): 0<x<1, 0<y<\frac{\pi}{2}, 0<t<T \right\}$ равномерную сетку, на которой будем строить разностную схему:
+\begin{displaymath}
+\omega_{h\tau} = 
+    \begin{cases}
+        x_n = nh_x, n = 0,...,N, h_x = \frac{1}{N},\\
+        y_k = kh_y, k = 0,...,K, h_y = \frac{\pi}{2K},\\
+        t_m = m\tau, m = 0,...,M, \tau = \frac{T}{M}\\
+    \end{cases}
+\end{displaymath}
+где $h_x$ -- шаг по координате $x$, $h_y$ -- шаг по координате $y$, $\tau$ -- шаг по времени. 
+На сетке $\omega_{h\tau}$ будем рассматривать сеточную функцию $u_{nk}^m = u(x_n, y_k, t_m)$. 
+\newline
+Оператор Лапласа аппроксимируем разностным оператором:
+\begin{displaymath}
+    \Lambda u = \Lambda_1 u + \Lambda_2 u
+\end{displaymath}
+\begin{displaymath}
+    \Lambda_1 u = \frac{u_{n+1,k} - 2u_{n,k} + u_{n-1,k}}{h_x^2}
+\end{displaymath}
+\begin{displaymath}
+    \Lambda_2 u = \frac{u_{n,k+1} - 2u_{n,k} + u_{n,k-1}}{h_y^2}
+\end{displaymath}
+Временной индекс для краткости опущен. Тогда уравнение для сеточной функции $u_{nk}^m$ примет вид:
+\begin{displaymath}
+    \frac{u^{m+1} - u^m}{\tau} = \Lambda \left( \sigma u^{m+1} + (1-\sigma)u^m \right) + f(x_n, y_k, t_{m+1}),
+\end{displaymath}
+где $f(x_n, y_k, t_{m+1})$ -- неоднородность нашей задачи.
+\newline
+Начальное условие для сеточной функции запишем в виде:
+\begin{displaymath}
+    u_{nk}^0 = 0, для всех n = 0,...N, k = 0,...,K
+\end{displaymath}
+Граничные условия при $y=0$ аппроксимируются точно:
+\begin{displaymath}
+    u_{n,0} = 0, для всех n = 0,...N
+\end{displaymath}
+Граничные условия в остальных точках могут быть аппроксимированы с помощью односторонней разностной производной:
+\begin{displaymath}
+    \frac{u_{1,k} - u_{0,k}}{h_x} = \frac{u_{N,k} - u_{N-1,k}}{h_x} = \frac{u_{n,K} - u_{n,K-1}}{h_y} = 0
+\end{displaymath}
+При решении многомерной задачи методом сеток важен объем вычислений, то есть число арифметических действий для решения задачи с требуемой точностью. Рассмотрим различные варианты выбора параметра $\sigma$, то есть различные вариации схемы: 
+\newline
+1) Явная схема ($\sigma = 0$) -- условно устойчива. Число операций, необходимых для перехода на новый слой $u^{m+1}$ пропорционально числу узлов сетки:
+\begin{displaymath}
+    Q_{\text{яв}} = O\left( \frac{1}{h_xh_y} \right)
+\end{displaymath} 
+\newline
+2) Неявная схема ($\sigma = 1$) -- безусловно устойчива. В данном случае число операций, необходимых для перехода на новый слой $u^{m+1}$ пропорционально кубу числа узлов сетки:
+\begin{displaymath}
+    Q_{\text{неяв}} = O\left( \frac{1}{(h_xh_y)^3} \right)
+\end{displaymath} 
+\newline
+3) Схема переменных направлений -- безусловно устойчива. Число операций, требуемое для перехода на новый слой, пропорционально числу узлов сетки. То есть схема переменных направлений сочетает в себе достоинства явной и неявной схем. Такая схема является экономичной, так как на нахождение одной неизвестной в ней требуется фиксированное число действий. 
+
+В схеме переменных направлений переход со слоя на слой осуществляется в два этапа с помощью вычисления промежуточного временного слоя $m + \frac{1}{2}$. Разностная аппроксимация уравнения имеет вид:
+\begin{displaymath}
+    \frac{u^{m+\frac{1}{2}} - u^m}{\frac{1}{2}\tau} = \Lambda_1 u^{m+\frac{1}{2}} + \Lambda_2 u^m + f^{m+\frac{1}{2}}
+\end{displaymath}
+\begin{displaymath}
+    \frac{ u^{m+1} - u^{m+\frac{1}{2}}}{\frac{1}{2}\tau} = \Lambda_1 u^{m+\frac{1}{2}} + \Lambda_2 u^{m+1} + f^{m+\frac{1}{2}}
+\end{displaymath}
+Переход со слоя $m$ к слою $m+1$ осуществляется в два этапа с шагом $\frac{\tau}{2}$. Сначала решается первое уравнение, являющееся неявным по направлению $x$ и явным по направлению $y$, а затем второе уравнение, которое является явным по направлению $x$ и неявным по направлению $y$. При решении в обоих случаях используется метод прогонки. Значение сеточной функции на промежуточном слое играет вспомогательную роль. схема переменных направлений безусловно устойчива при любых шагах $h_x, h_y, \tau$. 
+\newline
+Рассмотрим переход со слоя $m$ на промежуточный слой $m + \frac{1}{2}$:
+\begin{displaymath}
+    \displaystyle \frac{u_{n,k}^{m + \frac{1}{2}} - u_{n,k}^m}{\frac{1}{2}\tau} = \frac{ u_{n+1,k}^{m + \frac{1}{2}} - 2u_{n,k}^{m + \frac{1}{2}} + u_{n-1,k}^{m + \frac{1}{2}}}{ h_x^2 } + \frac{ u_{n,k+1}^{m} - 2u_{n,k}^{m} + u_{n,k-1}^{m}}{ h_y^2 } + f_{n,k}^{m+\frac{1}{2}}
+\end{displaymath}
+Перепишем в более удобном виде:
+\begin{displaymath}
+    \begin{cases}
+        \vspace{0.2 cm}
+        \displaystyle \frac{0.5\tau}{h_x^2}u_{n+1, k}^{m+\frac{1}{2}} - \left( 1 + \frac{\tau}{h_x^2} \right) u_{n,k}^{m + \frac{1}{2}} + \frac{0.5\tau}{h_x^2}u_{n-1,k}^{m + \frac{1}{2}} = -F_{n,k}^{m + \frac{1}{2}}\\
+        \vspace{0.2 cm}
+        \displaystyle F_{n,k}^{m + \frac{1}{2}} = \frac{0.5\tau}{h_y^2} \left( u_{n,k-1}^m  + u_{n, k+1}^m  \right) + \left( 1 - \frac{\tau}{h_y^2} \right)u_{n, k}^m + 0.5\tau f_{n,k}^{m+\frac{1}{2}}\\
+        \displaystyle \frac{u_{1, k} - u_{0, k}}{h_x} = \frac{u_{N, k} - u_{N-1, k}}{h_x} = 0
+    \end{cases}
+\end{displaymath}
+
+Подобная система решается методом прогонки при каждом фиксированном $k = 1...K -1$. При $k=0$ и $k=K$ значение функции находим из включенных в задачу граничных условий. В результате получаем значение рассматриваемой функции на $m + \frac{1}{2}$ вспомогательном слое. 
+\newline
+Чтобы осуществить переход на $m+1$  слой, аналогично рассмотрим:
+\begin{displaymath}
+    \displaystyle \frac{u_{n,k}^{m + 1} - u_{n,k}^{m + \frac{1}{2}}}{\frac{1}{2}\tau} = \frac{ u_{n+1,k}^{m + \frac{1}{2}} - 2u_{n,k}^{m + \frac{1}{2}} + u_{n-1,k}^{m + \frac{1}{2}}}{ h_x^2 } + \frac{ u_{n,k+1}^{m+1} - 2u_{n,k}^{m+1} + u_{n,k-1}^{m+1}}{ h_y^2 } + f_{n,k}^{m+\frac{1}{2}}
+\end{displaymath}
+\newline
+Перепишем в более удобном виде:
+\begin{displaymath}
+    \begin{cases}
+        \vspace{0.2 cm}
+        \displaystyle \frac{0.5\tau}{h_y^2}u_{n, k+1}^{m+1} - \left( 1 + \frac{\tau}{h_y^2} \right) u_{n,k}^{m + 1} + \frac{0.5\tau}{h_y^2}u_{n,k-1}^{m + 1} = -F_{n,k}^{m + 1}\\
+        \vspace{0.2 cm}
+        \displaystyle F_{n,k}^{m + 1} = \frac{0.5\tau}{h_x^2} \left( u_{n-1,k}^{m + \frac{1}{2}}  + u_{n+1, k}^{m + \frac{1}{2}}  \right) + \left( 1 - \frac{\tau}{h_x^2} \right)u_{n, k}^{m + \frac{1}{2}} + 0.5\tau f_{n,k}^{m+\frac{1}{2}}\\
+        \displaystyle u_{n,0} = \frac{u_{n, K} - u_{n, K-1}}{h_y} = 0
+    \end{cases}
+\end{displaymath}
+Эта система также решается методом прогонки, но уже при фиксированном $n=1...N-1$, при $n=0$ и $n=N$ значение функции находим из граничных условий. В результате получаем значение функции на интересующем нас $m+1$ временном слое. 
+Полученные системы образуют задачу, которая решается методом прогонки. При переходе от слоя $m+1$ к $m+2$ процедура повторяется. 
+\subsection{Метод прогонки}
+Рассмотрим первый полуслой и будем решать задачу методом прогонки, который в данной задаче основывается на решении линейных систем с трехдиагональной матрицей. Пусть имеется уравнение с начальными и граничными условиями:
+\begin{displaymath}
+    \begin{cases}
+        A_iy_{i-1} - C_iy_i + B_iy_{i+1} = -F_i\\
+        y_0 = \alpha_1 y_1 + \beta_1\\
+        y_N = \alpha_2 y_{N-1} + \beta_2
+    \end{cases}
+\end{displaymath}
+где $|C_i|>|A_i| + |B_i|, 0<\alpha_{1,2}<1, i=1...N$. 
+\newline
+В нашем случае считаем, что:
+\begin{displaymath}
+    A_i=\frac{0.5\tau}{h_x^2}, C_i = \left( 1 + \frac{\tau}{h_x^2} \right), B_i = \frac{0.5\tau}{h_x^2}
+\end{displaymath}
+\begin{displaymath}
+    y_{i-1} = u_{n-1, k}^{m+\frac{1}{2}}, y_i = u_{n,k}^{m+\frac{1}{2}}, y_{i+1} = u_{n+1, k}^{m+\frac{1}{2}}
+\end{displaymath}
+Пусть значения исходной функции в двух соседних точках связаны следующим соотношением, т.е. вид решения:
+\begin{displaymath}
+    y_i = \mu_{i+1}y_{i+1} + \nu_{i+1}
+\end{displaymath}
+Тогда:
+\begin{displaymath}
+    y_{i-1} = \mu_{i}y_{i} + \nu_{i} = \mu_{i}\mu_{i+1}y_{i+1} + \mu_{i}\nu_{i+1} + \nu_{i}
+\end{displaymath}
+Используем метод прямой прогонки. Подставим это равенство в равенство выше. Получим:
+\begin{displaymath}
+    A_i( \mu_{i}\mu_{i+1}y_{i+1} + \mu_{i}\nu_{i+1} + \nu_{i}) - C_i(\mu_{i+1}y_{i+1} + \nu_{i+1}) + B_iy_{i+1} = -F_i
+\end{displaymath}
+Приравниваем коэффициенты при одинаковых степенях $y_{i+1}$ находим коэффициенты прогонки с помощью следующих рекуррентных формул:
+\begin{displaymath}
+    (A_i\mu_i - C_i)\mu_{i+1} + B_i = 0 \Rightarrow \mu_{i+1} = \frac{B_i}{C_i - A_i\mu_i}
+\end{displaymath}
+\begin{displaymath}
+    -F_i + (C_i - A_i\mu_i)\nu_{i+1} - A_i\nu_i = 0 \Rightarrow \nu_{i+1} = \frac{F_i + A_i\nu_i}{C_i - A_i\mu_i}
+\end{displaymath}
+Из граничного условия при $y = 0$ находим:
+\begin{displaymath}
+    \mu_1 = \alpha_1 = 0, \beta_1 = \nu_1 = 0
+\end{displaymath}
+Используя эти значения, совершим прогонку в направлении возрастания индекса, последовательно определяя значения коэффициентов $\mu_i, \nu_i$ для $i = 1...N$. 
+\newline
+Из второго граничного условия:
+\begin{displaymath}
+    \begin{cases}
+        y_N = \alpha_2 y_{N-1} + \beta_2\\
+        y_{N-1} = \mu_N y_N + \nu_N
+    \end{cases}
+    \Rightarrow y_N = \frac{\alpha_2 \nu_N + \beta_2}{1 - \alpha_2 \mu_N}
+\end{displaymath}
+где $\alpha_2 = 1, \beta_2 = 0$ (из граничных условий при $y = \frac{\pi}{2}$). 
+\newline
+Используя найденное значение $y_N$ и коэффициенты $\mu_i, \nu_i$, делаем обратную прогонку в сторону уменьшения значения индекса, последовательно определяя все значения $y_i (i = 2...N-1)$ по формуле:
+\begin{displaymath}
+    y_i = \mu_{i+1} y_{i+1} + \nu_{i+1}
+\end{displaymath}
+\newpage
+\section{Построение численного решения}
+Программа, реализующая решение задачи, написана на языке Matlab в одноименном пакете программ.
+На Рис. \ref{3D} представлены графические изображения решения в фиксированные моменты времени. Также к отчету прилагается файл формата gif, который демонстрирует динамику решения с течением времени.
+\begin{figure}[h]
+	\begin{minipage}[h]{0.49\linewidth}
+	\center{\includegraphics[scale=0.15]{res_t_05}\\(a) При $t=0.5$}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[h]{0.49\linewidth}
+	\center{\includegraphics[scale=0.15]{res_t_1}\\(б) При $t=1$}	
+	\end{minipage}
+        \hfill
+	\begin{minipage}[h]{0.49\linewidth}
+	\center{\includegraphics[scale=0.15]{res_t_15}\\(в) При $t=1.5$}
+	\end{minipage}
+	\hfill
+        \begin{minipage}[h]{0.49\linewidth}
+	\center{\includegraphics[scale=0.15]{res_t_2}\\(г) При $t=2$}
+	\end{minipage}
+	\caption{Численное решение в виде 3D графиков}
+	\label{3D}
+\end{figure}
+
+\section{Верификация работы программы}
+Для того, чтобы убедиться в правильности работы программы, сравним численное решение с аналитическим в фиксированные моменты $t$. На Рис. \ref{err} представлены графики относительной ошибки в моменты времени $t=1$ и $t=2$, при числе точек сетки $N=100$, $K = 100$ и $M = 50$. Видим, что максимальная ошибка не превышает $7.5 \%$.
+\begin{figure}[h]
+	\begin{minipage}[h]{0.49\linewidth}
+	\center{\includegraphics[scale=0.18]{err_t_1}\\(a) При $t=1$}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[h]{0.49\linewidth}
+	\center{\includegraphics[scale=0.18]{err_t_2}\\(б) При $t=2$}	
+	\end{minipage}
+	\caption{Относительная ошибка численного решения по отношению к аналитическому}
+	\label{err}
+\end{figure}
+\newline
+Попробуем увеличить число узлов сетки. На Рис. \ref{err_N} представлен график зависимости максимальной относительной ошибки от количества узлов сетки (произведения $N \cdot K \cdot M$).
+\begin{figure}[h]
+	\center{\includegraphics[scale=0.27]{err}}
+	\caption{Зависимость максимальной относительной ошибки от числа узлов сетки}	
+        \label{err_N}
+\end{figure}
+Видим, что при $N = 300, K = 300$ и $M = 400$ ошибка стала меньше $1 \%$.
+\section{Заключение}
+В настоящей работе было проведено численное решение начально-краевой задачи для уравнения теплопроводности с использованием схемы переменных направлений и метода прогонки. Перед выполнением численных расчетов было проведено аналитическое решение поставленной задачи. Для поиска решения в области $0<x<1, 0<y<\frac{\pi}{2}, 0<t<T$ была введена равномерная сетка с шагом $h_x$ по $x$, $h_y$ по $y$ и $\tau$ по $t$.
+\newline
+Программа была написана на языке Matlab в одноименном пакете программ (без использования встроенных функций). Количество точек по осям $x$ и $y$ было выбрано равным 100. Полный код программы содержится в Приложении. Далее была проведена проверка результатов вычислений. Для этого было проведено сравнение численного решения с аналитическим и посчитана относительная ошибка. Построили зависимость максимальной относительной ошибки от числа узлов сетки. Получили, что при числе точек $N = 300, K = 300$ и $M = 400$ ошибка становится меньше $1 \%$.
+\section{Приложение}
+\textbf{Программа, реализующая численное решение}
+\begin{verbatim}
+N_x = 100;
+N_y = 100;
+N_t = 50;
+t_max = 2;
+h_x = 1/(N_x-1);
+h_y = 0.5*pi/(N_y-1);
+tau = t_max/(N_t - 1);
+x = 0:h_x:1;
+y = 0:h_y:0.5*pi;
+t = 0:tau:t_max;
+gamma_x = tau/(h_x^2);
+gamma_y = tau/(h_y^2);
+u = zeros(N_x, N_y, 2*N_t+1);
+
+
+u(:, :, 1) = 0;     %начальное условие
+d_x = zeros(1 ,N_x);
+sigma_x = zeros(1, N_x);
+d_y = zeros(1, N_y);
+sigma_y = zeros(1, N_y);
+
+
+for j=2:2:2*N_t
+    for i2=2:N_y-1
+        d_x(2)= 1;          % из граничных условий в x=0
+        sigma_x(2) = 0;     % из граничных условий в x=0
+        A = 0.5*gamma_x;
+        B = 1 + gamma_x;
+        C= 0.5*gamma_x;
+        for m=2:N_x-1
+            F_m_x =  -(0.5.*gamma_y .* (u(m, i2-1, j-1) + u(m,
+            i2+1, j-1))+ (1 - gamma_y) .* u(m, i2, j-1) + 0.5 .*
+            tau.* x(m)*((tau.*(j + 1)./2).^2) .* sin(y(i2)));
+            d_x(m+1) = C./(B-A.*d_x(m));
+            sigma_x(m+1) = (F_m_x - A .* sigma_x(m))./(A .* d_x(m) - B);
+        end
+        d_x(2)= 1;
+        sigma_x(2) = 0;
+        u(N_x, i2, j) = sigma_x(N_x)./(1 - d_x(N_x));            % из граничных условий в x=1
+        for m=N_x:-1:2
+            u(m-1, i2, j) = d_x(m) .* u(m, i2, j) + sigma_x(m);
+        end
+    end
+    
+    
+    for i1=2:N_x-1
+        d_y(2) = 0;             % из граничных условий в y=0
+        sigma_y(2) = 0;         % из граничных условий s y=0
+        A =  0.5*gamma_y;
+        B = 1 + gamma_y;
+        C =  0.5*gamma_y;
+        for m=2:N_y-1
+            F_m_y =  -(0.5.*gamma_x.*(u(i1-1, m, j) + u(i1+1, m,
+            j))+ (1 - gamma_x).*u(i1, m, j) + 0.5.*tau.*x(i1).*
+            ((tau*(j-1)./2).^2) .* sin(y(m)));
+            d_y(m+1) = C ./(B - A .* d_y(m));
+            sigma_y(m+1) = (F_m_y - A .* sigma_y(m))./(A .* d_y(m) - B);
+        end
+    
+        u(i1, N_y, j+1) = sigma_y(N_y)./(1 - d_y(N_y));            % из граничных условий в y=pi/2
+        for m=N_y:-1:2
+            u(i1, m-1, j+1) = d_y(m).*u(i1, m, j+1) + sigma_y(m);
+        end
+        
+    end
+end
+
+
+figure(1)
+    surf(x, y(1:N_y-1), u(:, 1:N_y-1, 100)', EdgeColor='none')
+    set(findall(figure(1),'type','axes'),'fontsize',13)
+    xlabel('x', 'FontSize',18)
+    ylabel('y', 'FontSize',18)
+    zlabel('u', 'FontSize',18)
+    colorbar
+    grid on
+\end{verbatim}
+\end{document}
